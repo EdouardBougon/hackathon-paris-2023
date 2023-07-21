@@ -1,0 +1,4 @@
+@openzeppelin/=services/contracts/lib/@openzeppelin/
+forge-std/=services/contracts/lib/forge-std/src/
+ds-test=services/contracts/lib/ds-test/src/
+safe=services/contracts/lib/safe/contracts/

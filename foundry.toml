@@ -1,0 +1,6 @@
+[profile.default]
+src = 'services/contracts/src'
+out = 'services/contracts/out'
+libs = ['services/contracts/lib']
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
