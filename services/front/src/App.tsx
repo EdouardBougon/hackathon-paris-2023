@@ -4,14 +4,11 @@ import { Navbar } from "./components/navbar/Navbar";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { mainnet, polygon, optimism, arbitrum, zora } from "wagmi/chains";
+import { polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { CardPosition } from "./components/card/Card";
 
-const { chains, publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, zora],
-  [publicProvider()]
-);
+const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
 
 const { connectors } = getDefaultWallets({
   appName: "My RainbowKit App",
