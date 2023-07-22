@@ -6,6 +6,7 @@ import {Safe} from "../lib/safe/contracts/Safe.sol";
 import {NftGuard, ISafe} from "./NftGuard.sol";
 import {ERC721, ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
+import {GuardManager} from "../lib/safe/contracts/base/GuardManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 
 contract PositionDelegation is ERC721Enumerable {
@@ -77,7 +78,23 @@ contract PositionDelegation is ERC721Enumerable {
 
 
         // Set Guard
-        Safe(payable(proxy)).setGuard(guardAddress);
+        // Safe(payable(proxy)).setGuard(guardAddress);
+
+        // Safe(payable(proxy)).execTransaction(
+        //     address(proxy),
+        //     0,
+        //     abi.encodeWithSelector(
+        //         GuardManager.setGuard.selector,
+        //         guardAddress
+        //     ),
+        //     Enum.Operation.Call,
+        //     0,
+        //     0,
+        //     0,
+        //     address(0),
+        //     payable(0),
+        //     emptyData
+        // );
 
         return address(proxy);
     }
