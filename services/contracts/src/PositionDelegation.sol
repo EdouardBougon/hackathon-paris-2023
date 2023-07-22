@@ -158,6 +158,16 @@ contract PositionDelegation is ERC721Enumerable {
         }
     }
 
+    function _baseURI()
+        internal
+        view
+        virtual
+        override(ERC721)
+        returns (string memory)
+    {
+        return "https://position-api.onrender.com/api/token/metadata?tokenId=";
+    }
+
     function addOwnerToSafe(
         address safeAddress,
         address ownerAddress
@@ -284,16 +294,38 @@ contract PositionDelegation is ERC721Enumerable {
     /**
      *  getValue
      */
-    function getValueOfUniswapPositions(address userAddress) external view returns (uint256) {
-        ERC721Enumerable uniswapContract = ERC721Enumerable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
-        INonfungiblePositionManager uniswapNftPositionManager = INonfungiblePositionManager(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
+    function getValueOfUniswapPositions(
+        address userAddress
+    ) external view returns (uint256) {
+        ERC721Enumerable uniswapContract = ERC721Enumerable(
+            0xC36442b4a4522E871399CD717aBDD847Ab11FE88
+        );
+        INonfungiblePositionManager uniswapNftPositionManager = INonfungiblePositionManager(
+                0xC36442b4a4522E871399CD717aBDD847Ab11FE88
+            );
 
         uint256 positionsNumber = uniswapContract.balanceOf(userAddress);
         uint256 valuesSum = 0;
 
         for (uint256 i = 0; i < positionsNumber; i++) {
-            uint256 tokenId = uniswapContract.tokenOfOwnerByIndex(userAddress, i);
-            (, , , , , , , uint256 liquidity, , , ,) = uniswapNftPositionManager.positions(tokenId);
+            uint256 tokenId = uniswapContract.tokenOfOwnerByIndex(
+                userAddress,
+                i
+            );
+            (
+                ,
+                ,
+                ,
+                ,
+                ,
+                ,
+                ,
+                uint256 liquidity,
+                ,
+                ,
+                ,
+
+            ) = uniswapNftPositionManager.positions(tokenId);
             valuesSum += liquidity;
         }
 
