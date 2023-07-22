@@ -88,7 +88,7 @@ contract PositionDelegation is ERC721Enumerable {
         uint256 tokenId
     ) internal virtual override(ERC721) {
         bytes memory emptyData;
-        address safeAddress = userToSafe[from]; // To update when Baptiste will push
+        address safeAddress = tokenIdToSafe[tokenId];
         address[] memory owners = Safe(payable(safeAddress)).getOwners();
         address SENTINEL_OWNERS = address(0x1);
 
@@ -114,14 +114,17 @@ contract PositionDelegation is ERC721Enumerable {
         super._transfer(from, to, tokenId);
     }
 
+    /**
+     *  delegate
+     */
     function delegate() public {
         address safeAddress = getOrCreateSafe(msg.sender);
 
         uint256 ownerTokenId = totalSupply() + 1;
         _mint(address(this), ownerTokenId);
         uint256 userTokenId = totalSupply() + 1;
-        _mint(address(this), userTokenId);
-        
+        _mint(msg.sender, userTokenId);
+
         safeToTokenIds[safeAddress][0] = ownerTokenId;
         safeToTokenIds[safeAddress][1] = userTokenId;
         tokenIdToSafe[ownerTokenId] = safeAddress;
