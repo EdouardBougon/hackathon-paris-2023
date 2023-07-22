@@ -6,6 +6,7 @@ import {Safe} from "../lib/safe/contracts/Safe.sol";
 import {NftGuard, ISafe} from "./NftGuard.sol";
 import {ERC721} from "../lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
+import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 
 contract PositionDelegation is ERC721 {
     mapping(address => address) public userToSafe;
@@ -22,12 +23,8 @@ contract PositionDelegation is ERC721 {
     }
 
     /**
-    Delegate position:
-    1. Get or Create Safe
-    2. Mint Nft for positon owner address and user address
-    4. Transfer position NFT to Safe
-    */
-
+     *  getOrCreateSafe
+     */
     function getOrCreateSafe(
         address userAddress
     ) public returns (address safeAddress) {
@@ -39,6 +36,9 @@ contract PositionDelegation is ERC721 {
         return safe;
     }
 
+    /**
+     *  createSafe
+     */
     function createSafe(
         address userAddress
     ) internal returns (address safeAddress) {
@@ -77,29 +77,37 @@ contract PositionDelegation is ERC721 {
         return address(proxy);
     }
 
+    /**
+     *  _transfer
+     */
     function _transfer(
         address from,
         address to,
         uint256 tokenId
     ) internal virtual override(ERC721) {
-        address tokenOwner = ownerOf(tokenId);
-        address safeAddress = userToSafe[tokenOwner];
+        bytes memory emptyData;
+        address safeAddress = userToSafe[from];
         address[] memory owners = Safe(payable(safeAddress)).getOwners();
+        address SENTINEL_OWNERS = address(0x1);
 
+        address prevAddress = owners[0] == from ? SENTINEL_OWNERS : owners[0];
         Safe(payable(safeAddress)).execTransaction(
-            address(this),
+            safeAddress,
             0,
-            abi.encodeWithSignature("removeOwner(address)", tokenOwner),
+            abi.encodeWithSelector(
+                OwnerManager.swapOwner.selector,
+                prevAddress,
+                from,
+                to
+            ),
+            Enum.Operation.Call,
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0
+            address(0),
+            payable(0),
+            emptyData
         );
-
-        OwnerManager(safeAddress).removeOwner(tokenOwner);
 
         super._transfer(from, to, tokenId);
     }
