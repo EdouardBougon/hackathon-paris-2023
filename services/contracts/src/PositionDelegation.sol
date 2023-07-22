@@ -9,7 +9,7 @@ import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 
 contract PositionDelegation is ERC721 {
     mapping(address => address) public userToSafe;
-    address private wethContractAddress;
+    address private immutable guardAddress;
 
     /**
      *  constructor
@@ -17,7 +17,8 @@ contract PositionDelegation is ERC721 {
     constructor(
         address _wethContractAddress
     ) ERC721("PositionDelegation", "PD") {
-        wethContractAddress = _wethContractAddress;
+        NftGuard guard = new NftGuard(_wethContractAddress);
+        guardAddress = address(guard);
     }
 
     /**
@@ -28,19 +29,11 @@ contract PositionDelegation is ERC721 {
     */
 
     function getOrCreateSafe(
-        address userAddress,
-        address nftContractAddress,
-        uint256 ownerTokenId,
-        uint256 userTokenId
+        address userAddress
     ) public returns (address safeAddress) {
         address safe = userToSafe[userAddress];
         if (safe == address(0)) {
-            safe = createSafe(
-                userAddress,
-                nftContractAddress,
-                ownerTokenId,
-                userTokenId
-            );
+            safe = createSafe(userAddress);
             userToSafe[userAddress] = safe;
         }
         return safe;
@@ -55,7 +48,6 @@ contract PositionDelegation is ERC721 {
             0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2 // multichain address
         );
         SafeProxy proxy;
-        NftGuard guard = new NftGuard(wethContractAddress);
 
         owners[0] = msg.sender;
         owners[1] = userAddress;
@@ -80,7 +72,7 @@ contract PositionDelegation is ERC721 {
         ); // Address that should receive the payment (or 0 if tx.origin)
 
         // Set Guard
-        Safe(payable(proxy)).setGuard(address(guard));
+        Safe(payable(proxy)).setGuard(guardAddress);
 
         return address(proxy);
     }
@@ -92,7 +84,20 @@ contract PositionDelegation is ERC721 {
     ) internal virtual override(ERC721) {
         address tokenOwner = ownerOf(tokenId);
         address safeAddress = userToSafe[tokenOwner];
-        address[] memory owners = ISafe(safeAddress).getOwners();
+        address[] memory owners = Safe(payable(safeAddress)).getOwners();
+
+        Safe(payable(safeAddress)).execTransaction(
+            address(this),
+            0,
+            abi.encodeWithSignature("removeOwner(address)", tokenOwner),
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
 
         OwnerManager(safeAddress).removeOwner(tokenOwner);
 
