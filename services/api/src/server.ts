@@ -98,7 +98,7 @@ app.get('/api/token/metadata/image', async (req: Request, res: Response): Promis
       <text x="50%" y="85%" fill="white" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">${positionString} USD</text>
     </svg>`;
 
-  res.writeHead(200, {}).end(body)
+  res.writeHead(200, {'Content-Type': 'image/svg+xml'}).end(body)
 });
 
 
