@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: position-api
+    plan: standard
+    env: node
+    branch: main
+    region: frankfurt
+    rootDir: services/api
+    buildCommand: npm i
+    startCommand: npm run start:prod
+    numInstances: 2
+    healthCheckPath: /api/heartbeat
+    autoDeploy: true
+
+  - type: web
+    name: position-front
+    runtime: static
+    rootDir: services/front
+    buildCommand: npm i && npm run build
+    staticPublishPath: ./dist
+    routes:
+      # rewrite /* requests to /
+      - type: rewrite
+        source: /*
+        destination: /
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: true
+    autoDeploy: true
