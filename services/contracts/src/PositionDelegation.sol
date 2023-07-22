@@ -98,7 +98,7 @@ contract PositionDelegation is ERC721Enumerable {
             emptyData
         );
 
-        mintNftsForSafe(safeAddress);
+        mintNftsForSafe(address(proxy));
 
         return address(proxy);
     }
