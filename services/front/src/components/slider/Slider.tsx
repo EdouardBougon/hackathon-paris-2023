@@ -11,9 +11,11 @@ import {
 
 export function SliderAmount() {
   return (
-    <Flex marginTop={10} justify={"center"} align={"center"} gap={10}>
-      <Text>0</Text>
-      <Box w="100%">
+    <Flex marginTop={10} justify="space-between" align="center" gap={10}>
+      <Box w="10%">
+        <Text>0</Text>
+      </Box>
+      <Box w="80%">
         <Slider aria-label="slider-ex-1" defaultValue={30} marginTop="8">
           <SliderTrack>
             <SliderFilledTrack />
@@ -24,7 +26,9 @@ export function SliderAmount() {
           <Text>100</Text>
         </Center>
       </Box>
-      <Text>Max to Borrow</Text>
+      <Box w="10%">
+        <Text>Max to Borrow</Text>
+      </Box>
     </Flex>
   );
 }
