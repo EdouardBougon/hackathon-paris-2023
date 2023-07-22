@@ -223,12 +223,17 @@ contract PositionDelegation is ERC721Enumerable {
     /**
      *  delegate
      */
-    function delegate(address tokenAddress, uint256 tokenId) public {
+    function delegate(
+        address tokenAddress,
+        uint256 tokenId
+    ) public returns (address returnedSafeAddress) {
         address safeAddress = getOrCreateSafe(msg.sender);
 
         if (safeToTokenIds[safeAddress][0] == 0) {}
 
         ERC721 tokenContract = ERC721(tokenAddress);
         tokenContract.transferFrom(msg.sender, safeAddress, tokenId);
+
+        return safeAddress;
     }
 }
