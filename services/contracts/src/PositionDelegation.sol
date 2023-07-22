@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {SafeProxyFactory, SafeProxy} from "../lib/safe/contracts/proxies/SafeProxyFactory.sol";
-import {Safe} from "../lib/safe/contracts/Safe.sol";
+import {CustomeSafe} from "./CustomSafe.sol";
 import {ERC721, ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {NftGuard} from "./NftGuard.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
@@ -58,7 +58,7 @@ contract PositionDelegation is ERC721Enumerable {
         owners[0] = address(this);
         owners[1] = userAddress;
 
-        Safe singleton = new Safe();
+        CustomeSafe singleton = new CustomeSafe();
 
         // safe address
         proxy = factory.createProxyWithNonce(
@@ -67,7 +67,7 @@ contract PositionDelegation is ERC721Enumerable {
             block.timestamp
         );
 
-        Safe(payable(proxy)).setup(
+        CustomeSafe(payable(proxy)).setup(
             owners,
             1, // threshold
             address(0), // Contract address for optional delegate call
@@ -79,7 +79,7 @@ contract PositionDelegation is ERC721Enumerable {
         ); // Address that should receive the payment (or 0 if tx.origin)
 
         // Set Guard
-        Safe(payable(proxy)).setGuard(guardAddress);
+        CustomeSafe(payable(proxy)).setGuard(guardAddress);
 
         return address(proxy);
     }
@@ -107,7 +107,7 @@ contract PositionDelegation is ERC721Enumerable {
         uint256 userTokenId = tokenIds[1];
         address ownerTokenOwner = ownerOf(ownerTokenId);
         address userTokenOwner = ownerOf(userTokenId);
-        address[] memory owners = Safe(payable(safeAddress)).getOwners();
+        address[] memory owners = CustomeSafe(payable(safeAddress)).getOwners();
 
         bool isOwnerTokenChange = ownerTokenId == tokenId;
         bool isUserTokenChange = userTokenId == tokenId;
@@ -129,7 +129,7 @@ contract PositionDelegation is ERC721Enumerable {
 
         // CheckOrder
         if (owners.length == 3) {
-            owners = Safe(payable(safeAddress)).getOwners();
+            owners = CustomeSafe(payable(safeAddress)).getOwners();
             userTokenOwner = ownerOf(userTokenId);
             if (owners[1] == userTokenOwner) {
                 removeOwnerFromSafe(safeAddress, userTokenOwner);
@@ -143,7 +143,7 @@ contract PositionDelegation is ERC721Enumerable {
         address ownerAddress
     ) internal {
         bytes memory emptyData;
-        Safe(payable(safeAddress)).execTransaction(
+        CustomeSafe(payable(safeAddress)).execTransaction(
             safeAddress,
             0,
             abi.encodeWithSelector(
@@ -166,9 +166,9 @@ contract PositionDelegation is ERC721Enumerable {
         address ownerAddress
     ) internal {
         bytes memory emptyData;
-        address[] memory owners = Safe(payable(safeAddress)).getOwners();
+        address[] memory owners = CustomeSafe(payable(safeAddress)).getOwners();
         address prevAddress = owners[1] == ownerAddress ? owners[0] : owners[1];
-        Safe(payable(safeAddress)).execTransaction(
+        CustomeSafe(payable(safeAddress)).execTransaction(
             safeAddress,
             0,
             // removeOwner(address prevOwner, address owner, uint256 _threshold)
