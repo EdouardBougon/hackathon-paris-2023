@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.19;
 
 import {SafeProxyFactory, SafeProxy} from "../lib/safe/contracts/proxies/SafeProxyFactory.sol";
 import {Safe} from "../lib/safe/contracts/Safe.sol";
-import {NftGuard, ISafe} from "./NftGuard.sol";
 import {ERC721, ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {NftGuard} from "./NftGuard.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
+import {NftGuard} from "./NftGuard.sol";
 
 contract PositionDelegation is ERC721Enumerable {
+    address internal constant SENTINEL_OWNERS = address(0x1);
+
     mapping(address => address) public userToSafe;
     mapping(address => uint256[2]) public safeToTokenIds;
     mapping(uint256 => address) public tokenIdToSafe;
@@ -52,7 +55,7 @@ contract PositionDelegation is ERC721Enumerable {
         );
         SafeProxy proxy;
 
-        owners[0] = msg.sender;
+        owners[0] = address(this);
         owners[1] = userAddress;
 
         Safe singleton = new Safe();
@@ -75,7 +78,6 @@ contract PositionDelegation is ERC721Enumerable {
             payable(0)
         ); // Address that should receive the payment (or 0 if tx.origin)
 
-
         // Set Guard
         Safe(payable(proxy)).setGuard(guardAddress);
 
@@ -84,26 +86,70 @@ contract PositionDelegation is ERC721Enumerable {
 
     /**
      *  _transfer
+        1. Get safeAddress from tokenIdToSafe
+        2. Get 2 tokensIds from safeToTokenIds
+        3. Get owners from tokensIds
+        4. Get owners from Safe
      */
     function _transfer(
         address from,
         address to,
         uint256 tokenId
     ) internal virtual override(ERC721) {
-        bytes memory emptyData;
-        address safeAddress = tokenIdToSafe[tokenId];
-        address[] memory owners = Safe(payable(safeAddress)).getOwners();
-        address SENTINEL_OWNERS = address(0x1);
+        require(
+            to != address(this),
+            "ERC721: transfer to this contract not allowed"
+        );
 
-        address prevAddress = owners[0] == from ? SENTINEL_OWNERS : owners[0];
+        address safeAddress = tokenIdToSafe[tokenId];
+        uint256[2] memory tokenIds = safeToTokenIds[safeAddress];
+        uint256 ownerTokenId = tokenIds[0];
+        uint256 userTokenId = tokenIds[1];
+        address ownerTokenOwner = ownerOf(ownerTokenId);
+        address userTokenOwner = ownerOf(userTokenId);
+        address[] memory owners = Safe(payable(safeAddress)).getOwners();
+
+        bool isOwnerTokenChange = ownerTokenId == tokenId;
+        bool isUserTokenChange = userTokenId == tokenId;
+
+        if (owners.length == 2) {
+            addOwnerToSafe(safeAddress, to);
+        } else if (owners.length == 3) {
+            removeOwnerFromSafe(safeAddress, to);
+
+            if (
+                (isOwnerTokenChange && to != userTokenOwner) ||
+                (isUserTokenChange && to != ownerTokenOwner)
+            ) {
+                addOwnerToSafe(safeAddress, to);
+            }
+        }
+
+        super._transfer(from, to, tokenId);
+
+        // CheckOrder
+        if (owners.length == 3) {
+            owners = Safe(payable(safeAddress)).getOwners();
+            userTokenOwner = ownerOf(userTokenId);
+            if (owners[1] == userTokenOwner) {
+                removeOwnerFromSafe(safeAddress, userTokenOwner);
+                addOwnerToSafe(safeAddress, userTokenOwner);
+            }
+        }
+    }
+
+    function addOwnerToSafe(
+        address safeAddress,
+        address ownerAddress
+    ) internal {
+        bytes memory emptyData;
         Safe(payable(safeAddress)).execTransaction(
             safeAddress,
             0,
             abi.encodeWithSelector(
-                OwnerManager.swapOwner.selector,
-                prevAddress,
-                from,
-                to
+                OwnerManager.addOwnerWithThreshold.selector,
+                ownerAddress,
+                1
             ),
             Enum.Operation.Call,
             0,
@@ -113,18 +159,41 @@ contract PositionDelegation is ERC721Enumerable {
             payable(0),
             emptyData
         );
+    }
 
-        super._transfer(from, to, tokenId);
+    function removeOwnerFromSafe(
+        address safeAddress,
+        address ownerAddress
+    ) internal {
+        bytes memory emptyData;
+        address[] memory owners = Safe(payable(safeAddress)).getOwners();
+        address prevAddress = owners[1] == ownerAddress ? owners[0] : owners[1];
+        Safe(payable(safeAddress)).execTransaction(
+            safeAddress,
+            0,
+            // removeOwner(address prevOwner, address owner, uint256 _threshold)
+            abi.encodeWithSelector(
+                OwnerManager.removeOwner.selector,
+                prevAddress,
+                ownerAddress,
+                1
+            ),
+            Enum.Operation.Call,
+            0,
+            0,
+            0,
+            address(0),
+            payable(0),
+            emptyData
+        );
     }
 
     /**
-     *  delegate
+     *  mintNftsForSafe
      */
-    function delegate() public {
-        address safeAddress = getOrCreateSafe(msg.sender);
-
+    function mintNftsForSafe(address safeAddress) private {
         uint256 ownerTokenId = totalSupply() + 1;
-        _mint(address(this), ownerTokenId);
+        _mint(msg.sender, ownerTokenId);
         uint256 userTokenId = totalSupply() + 1;
         _mint(msg.sender, userTokenId);
 
@@ -132,5 +201,17 @@ contract PositionDelegation is ERC721Enumerable {
         safeToTokenIds[safeAddress][1] = userTokenId;
         tokenIdToSafe[ownerTokenId] = safeAddress;
         tokenIdToSafe[userTokenId] = safeAddress;
+    }
+
+    /**
+     *  delegate
+     */
+    function delegate(address tokenAddress, uint256 tokenId) public {
+        address safeAddress = getOrCreateSafe(msg.sender);
+
+        if (safeToTokenIds[safeAddress][0] == 0) {}
+
+        ERC721 tokenContract = ERC721(tokenAddress);
+        tokenContract.transferFrom(msg.sender, safeAddress, tokenId);
     }
 }
