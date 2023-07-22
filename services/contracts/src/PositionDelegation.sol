@@ -236,4 +236,13 @@ contract PositionDelegation is ERC721Enumerable {
 
         return safeAddress;
     }
+
+    /**
+     *  getSafeAddressForUser
+     */
+    function getSafeAddressForUser(
+        address userAddress
+    ) public view returns (address safeAddress) {
+        return userToSafe[userAddress];
+    }
 }
