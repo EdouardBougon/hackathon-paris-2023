@@ -8,6 +8,8 @@ import {ERC721} from "../lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 
+import {console} from "forge-std/console.sol";
+
 contract PositionDelegation is ERC721 {
     mapping(address => address) public userToSafe;
     address private immutable guardAddress;
@@ -31,6 +33,7 @@ contract PositionDelegation is ERC721 {
         address safe = userToSafe[userAddress];
         if (safe == address(0)) {
             safe = createSafe(userAddress);
+
             userToSafe[userAddress] = safe;
         }
         return safe;
@@ -52,6 +55,8 @@ contract PositionDelegation is ERC721 {
         owners[0] = msg.sender;
         owners[1] = userAddress;
 
+        console.log(userAddress);
+
         Safe singleton = new Safe();
 
         // safe address
@@ -60,6 +65,7 @@ contract PositionDelegation is ERC721 {
             emptyData,
             block.timestamp
         );
+
         Safe(payable(proxy)).setup(
             owners,
             1, // threshold
@@ -70,6 +76,9 @@ contract PositionDelegation is ERC721 {
             0, // Value that should be paid
             payable(0)
         ); // Address that should receive the payment (or 0 if tx.origin)
+
+        console.log("ha4");
+
 
         // Set Guard
         Safe(payable(proxy)).setGuard(guardAddress);

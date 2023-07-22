@@ -7,12 +7,12 @@ import "../src/PositionDelegation.sol";
 
 contract Deploy is Script {
     function run() public {
-        vm.createFork("https://polygon.llamarpc.com");
-
-        PositionDelegation factory = new PositionDelegation();
+        uint forkId = vm.createFork("https://polygon.llamarpc.com");
+        vm.selectFork(forkId);
 
         vm.broadcast();
 
-        factory.createSafe(address(this));
+        PositionDelegation factory = new PositionDelegation(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619);
+        factory.getOrCreateSafe(address(this));
     }
 }
