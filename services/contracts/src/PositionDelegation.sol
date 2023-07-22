@@ -259,4 +259,24 @@ contract PositionDelegation is ERC721Enumerable {
     ) public view returns (address safeAddress) {
         return userToSafe[userAddress];
     }
+
+    /**
+     *  getSafeAddressForTokenId
+     */
+    function getSafeAddressForTokenId(
+        uint256 tokenId
+    ) public view returns (address safeAddress) {
+        return tokenIdToSafe[tokenId];
+    }
+
+    /**
+     *  isTokenIdOwner
+     */
+    function isTokenIdOwner(
+        uint256 tokenId
+    ) public view returns (bool isOwner) {
+        address safeAddress = tokenIdToSafe[tokenId];
+
+        return safeToTokenIds[safeAddress][0] == tokenId;
+    }
 }
