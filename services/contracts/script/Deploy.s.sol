@@ -4,8 +4,7 @@ pragma solidity ^0.8.19;
 import "../lib/forge-std/src/Script.sol";
 
 import "../src/PositionDelegation.sol";
-
-contract RandomAddress {}
+import {console} from "../lib/forge-std/src/console.sol";
 
 contract Deploy is Script {
     function run() public {
@@ -14,7 +13,10 @@ contract Deploy is Script {
 
         vm.startBroadcast();
 
-        PositionDelegation factory = new PositionDelegation(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619);
-        factory.getOrCreateSafe(address(new RandomAddress()));
+        PositionDelegation factory = new PositionDelegation(
+            0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619
+        );
+
+        console.log("Factory address: %s", address(factory));
     }
 }
