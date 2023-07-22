@@ -147,12 +147,13 @@ contract PositionDelegation is ERC721Enumerable {
         super._transfer(from, to, tokenId);
 
         // CheckOrder
+        // Owner should always be the first owner
         if (owners.length == 3) {
             owners = CustomSafe(payable(safeAddress)).getOwners();
-            userTokenOwner = ownerOf(userTokenId);
-            if (owners[1] == userTokenOwner) {
-                removeOwnerFromSafe(safeAddress, userTokenOwner);
-                addOwnerToSafe(safeAddress, userTokenOwner);
+            ownerTokenOwner = ownerOf(ownerTokenId);
+            if (owners[1] == ownerTokenOwner) {
+                removeOwnerFromSafe(safeAddress, ownerTokenOwner);
+                addOwnerToSafe(safeAddress, ownerTokenOwner);
             }
         }
     }

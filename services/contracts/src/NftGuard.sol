@@ -38,10 +38,10 @@ contract NftGuard is BaseGuard {
         address msgSender
     ) external {
         address[] memory owners = ISafe(msg.sender).getOwners();
-        address userAddress = owners[1];
+        address userAddress = owners[0];
 
         if (owners.length == 3) {
-            userAddress = owners[2];
+            userAddress = owners[1];
             // If the call is done to Safe Wallet, from user address, revert
             require(
                 to != msg.sender || msgSender != userAddress,
@@ -59,7 +59,7 @@ contract NftGuard is BaseGuard {
         address[] memory owners = ISafe(msg.sender).getOwners();
 
         if (owners.length == 3) {
-            address userAddress = owners[2];
+            address userAddress = owners[1];
             uint256 newWethAmount = IERC20(wethContractAddress).balanceOf(
                 userAddress
             );
