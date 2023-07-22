@@ -22,7 +22,7 @@ contract PositionDelegation is ERC721Enumerable {
     /**
      *  constructor
      */
-    constructor() ERC721("PositionDelegation", "PD") {
+    constructor() ERC721("Position Delegation V2", "PD") {
         NftGuard guard = new NftGuard(address(this));
         guardAddress = address(guard);
     }
