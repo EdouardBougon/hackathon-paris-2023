@@ -55,8 +55,6 @@ contract PositionDelegation is ERC721Enumerable {
         owners[0] = msg.sender;
         owners[1] = userAddress;
 
-        console.log(userAddress);
-
         Safe singleton = new Safe();
 
         // safe address
@@ -76,8 +74,6 @@ contract PositionDelegation is ERC721Enumerable {
             0, // Value that should be paid
             payable(0)
         ); // Address that should receive the payment (or 0 if tx.origin)
-
-        console.log("ha4");
 
 
         // Set Guard
