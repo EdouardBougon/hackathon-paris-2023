@@ -13,7 +13,8 @@ import { polygon } from 'viem/chains';
 
 const app: express.Express = express();
 const internalPort: number = process.env.PORT !== undefined ? Number(process.env.PORT) : 8887;
-const externalPort: number = process.env.PORT !== undefined ? 80 : internalPort;
+const externalPort: number = process.env.PORT !== undefined ? 443 : internalPort;
+const protocol: string = externalPort === 443 ? 'https' : 'http';
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -48,7 +49,7 @@ app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void
   const body: any = {
     name: `Delegated ${permission}`,
     description: `NFT ${tokenId} for the delegated position account ${walletAddress}`,
-    image: `${req.protocol}://${req.hostname}:${externalPort}/api/token/metadata/image?tokenId=${tokenId}`,
+    image: `${protocol}://${req.hostname}:${externalPort}/api/token/metadata/image?tokenId=${tokenId}`,
     external_url: `https://polygonscan.com/tx/${walletAddress}`,
     attributes: [
       {
