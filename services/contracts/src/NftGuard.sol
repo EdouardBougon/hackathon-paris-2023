@@ -38,9 +38,10 @@ contract NftGuard is BaseGuard {
         address msgSender
     ) external {
         address[] memory owners = ISafe(msg.sender).getOwners();
-        address userAddress = owners[2];
+        address userAddress = owners[1];
 
         if (owners.length == 3) {
+            userAddress = owners[2];
             // If the call is done to Safe Wallet, from user address, revert
             require(
                 to != msg.sender || msgSender != userAddress,
