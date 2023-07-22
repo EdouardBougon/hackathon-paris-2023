@@ -86,7 +86,7 @@ contract PositionDelegation is ERC721 {
         uint256 tokenId
     ) internal virtual override(ERC721) {
         bytes memory emptyData;
-        address safeAddress = userToSafe[from];
+        address safeAddress = userToSafe[from]; // To update when Baptiste will push
         address[] memory owners = Safe(payable(safeAddress)).getOwners();
         address SENTINEL_OWNERS = address(0x1);
 
