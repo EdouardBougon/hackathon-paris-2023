@@ -10,17 +10,112 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Alchemy, OwnedNft } from "alchemy-sdk";
-import { settings, uniswapNftAddress } from "../../settings";
+import {
+  settings,
+  uniswapNftAddress,
+  uniswapPackageManager,
+} from "../../settings";
 import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useContractReads } from "wagmi";
 import { ButtonTx } from "../buttonTx/ButtonTx";
 
 const alchemy = new Alchemy(settings);
+
+const abi = [
+  {
+    inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+    name: "positions",
+    outputs: [
+      {
+        internalType: "uint96",
+        name: "nonce",
+        type: "uint96",
+      },
+      {
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "token0",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "token1",
+        type: "address",
+      },
+      {
+        internalType: "uint24",
+        name: "fee",
+        type: "uint24",
+      },
+      {
+        internalType: "int24",
+        name: "tickLower",
+        type: "int24",
+      },
+      {
+        internalType: "int24",
+        name: "tickUpper",
+        type: "int24",
+      },
+      {
+        internalType: "uint128",
+        name: "liquidity",
+        type: "uint128",
+      },
+      {
+        internalType: "uint256",
+        name: "feeGrowthInside0LastX128",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "feeGrowthInside1LastX128",
+        type: "uint256",
+      },
+      {
+        internalType: "uint128",
+        name: "tokensOwed0",
+        type: "uint128",
+      },
+      {
+        internalType: "uint128",
+        name: "tokensOwed1",
+        type: "uint128",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
 
 export function CardPosition() {
   const { address } = useAccount();
   const [positions, setPositions] = useState<OwnedNft[] | null>(null);
   const [tokenIds, setTokenIds] = useState<bigint[]>([]);
+  const [TotalValue, setTotalValue] = useState<number[]>([]);
+
+  useContractReads({
+    contracts: positions?.map((position) => ({
+      address: uniswapPackageManager,
+      abi: abi,
+      functionName: "positions",
+      args: [position.tokenId],
+    })),
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: (data) => {
+      const totalValue: number[] = [];
+      data?.forEach((position) => {
+        position && totalValue.push(Number((position.result as any)[7]) / 1e6);
+      });
+      setTotalValue(totalValue);
+    },
+  });
 
   // get all nft positions from uniswap v3 with alchemy
   const getUniswapV3Positions = useCallback(async () => {
@@ -49,7 +144,7 @@ export function CardPosition() {
           </Center>
         )}
         {positions &&
-          positions.map((position) => (
+          positions.map((position, index) => (
             <Card
               key={position.tokenId}
               cursor={"pointer"}
@@ -79,6 +174,11 @@ export function CardPosition() {
               <CardBody>
                 <Center>
                   <Img w="60%" src={position.media[0].gateway} />
+                </Center>
+                <Center>
+                  <Text marginTop={5}>
+                    Total value : ${TotalValue[index] * 2}
+                  </Text>
                 </Center>
               </CardBody>
             </Card>

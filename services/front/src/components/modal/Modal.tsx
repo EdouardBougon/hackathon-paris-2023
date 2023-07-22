@@ -27,9 +27,6 @@ export function ModalSuccess({ isOpen, onClose }: ModalProps) {
   const { data: safeAddress } = usePositionDelegationGetSafeAddressForUser({
     address: contractDelegation,
     args: [address ? address : "0x0000000"],
-    onSuccess: (data) => {
-      console.log(data);
-    },
   });
 
   return (
