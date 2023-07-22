@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.19;
 
 import "../lib/safe/contracts/base/GuardManager.sol";
 import "../lib/@openzeppelin/contracts/interfaces/IERC721.sol";
@@ -38,13 +38,15 @@ contract NftGuard is BaseGuard {
         address msgSender
     ) external {
         address[] memory owners = ISafe(msg.sender).getOwners();
-        address userAddress = owners[1];
+        address userAddress = owners[2];
 
-        // If the call is done to Safe Wallet, from user address, revert
-        require(
-            to != msg.sender || msgSender != userAddress,
-            "NftGuard: Not allowed to call Safe wallet directly"
-        );
+        if (owners.length == 3) {
+            // If the call is done to Safe Wallet, from user address, revert
+            require(
+                to != msg.sender || msgSender != userAddress,
+                "NftGuard: Not allowed to call Safe wallet directly"
+            );
+        }
 
         oldWethAmount = IERC20(wethContractAddress).balanceOf(userAddress);
     }
@@ -55,15 +57,17 @@ contract NftGuard is BaseGuard {
     function checkAfterExecution(bytes32 txHash, bool success) external {
         address[] memory owners = ISafe(msg.sender).getOwners();
 
-        address userAddress = owners[1];
-        uint256 newWethAmount = IERC20(wethContractAddress).balanceOf(
-            userAddress
-        );
+        if (owners.length == 3) {
+            address userAddress = owners[2];
+            uint256 newWethAmount = IERC20(wethContractAddress).balanceOf(
+                userAddress
+            );
 
-        require(
-            newWethAmount >= oldWethAmount,
-            "NftGuard: WETH balance decreased"
-        );
+            require(
+                newWethAmount >= oldWethAmount,
+                "NftGuard: WETH balance decreased"
+            );
+        }
 
         delete oldWethAmount;
     }
