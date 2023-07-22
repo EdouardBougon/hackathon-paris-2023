@@ -9,6 +9,7 @@ import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 import {GuardManager} from "../lib/safe/contracts/base/GuardManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 import {NftGuard} from "./NftGuard.sol";
+import {INonfungiblePositionManager} from "../interfaces/INonfungiblePositionManager.sol";
 
 contract PositionDelegation is ERC721Enumerable {
     address internal constant SENTINEL_OWNERS = address(0x1);
@@ -278,5 +279,24 @@ contract PositionDelegation is ERC721Enumerable {
         address safeAddress = tokenIdToSafe[tokenId];
 
         return safeToTokenIds[safeAddress][0] == tokenId;
+    }
+
+    /**
+     *  getValue
+     */
+    function getValueOfUniswapPositions(address userAddress) external view returns (uint256) {
+        ERC721Enumerable uniswapContract = ERC721Enumerable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
+        INonfungiblePositionManager uniswapNftPositionManager = INonfungiblePositionManager(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
+
+        uint256 positionsNumber = uniswapContract.balanceOf(userAddress);
+        uint256 valuesSum = 0;
+
+        for (uint256 i = 0; i < positionsNumber; i++) {
+            uint256 tokenId = uniswapContract.tokenOfOwnerByIndex(userAddress, i);
+            (, , , , , , , uint256 liquidity, , , ,) = uniswapNftPositionManager.positions(tokenId);
+            valuesSum += liquidity;
+        }
+
+        return valuesSum;
     }
 }
