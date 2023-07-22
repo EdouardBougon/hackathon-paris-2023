@@ -56,8 +56,7 @@ contract PositionDelegation is ERC721Enumerable {
         );
         SafeProxy proxy;
 
-        owners[0] = userAddress;
-        owners[1] = address(this);
+        owners[0] = address(this);
 
         CustomSafe singleton = new CustomSafe();
 
@@ -97,6 +96,8 @@ contract PositionDelegation is ERC721Enumerable {
             payable(0),
             emptyData
         );
+
+        addOwnerToSafe(address(proxy), userAddress);
 
         mintNftsForSafe(address(proxy));
 
