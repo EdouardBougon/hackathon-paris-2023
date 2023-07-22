@@ -133,7 +133,7 @@ contract PositionDelegation is ERC721Enumerable {
         if (owners.length == 2) {
             addOwnerToSafe(safeAddress, to);
         } else if (owners.length == 3) {
-            removeOwnerFromSafe(safeAddress, to);
+            removeOwnerFromSafe(safeAddress, from);
 
             if (
                 (isOwnerTokenChange && to != userTokenOwner) ||
