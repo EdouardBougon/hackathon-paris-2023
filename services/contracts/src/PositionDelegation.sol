@@ -56,8 +56,8 @@ contract PositionDelegation is ERC721Enumerable {
         );
         SafeProxy proxy;
 
-        owners[0] = address(this);
-        owners[1] = userAddress;
+        owners[0] = userAddress;
+        owners[1] = address(this);
 
         CustomSafe singleton = new CustomSafe();
 
