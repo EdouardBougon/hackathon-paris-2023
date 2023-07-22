@@ -7,7 +7,11 @@ import {
 } from "@chakra-ui/react";
 import { ModalSuccess } from "../modal/Modal";
 
-export function ButtonTx() {
+interface ButtonTxProps {
+  tokenIds: bigint[];
+}
+
+export function ButtonTx({ tokenIds }: ButtonTxProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (

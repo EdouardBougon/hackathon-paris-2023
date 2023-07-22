@@ -7,7 +7,6 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, zora } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { CardPosition } from "./components/card/Card";
-import { ButtonTx } from "./components/buttonTx/ButtonTx";
 
 const { chains, publicClient } = configureChains(
   [mainnet, polygon, optimism, arbitrum, zora],
@@ -16,7 +15,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "My RainbowKit App",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "b65e7127e551cc0f9290785b43b289d5",
   chains,
 });
 
@@ -33,7 +32,6 @@ function App() {
         <ChakraProvider>
           <Navbar />
           <CardPosition />
-          <ButtonTx />
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
