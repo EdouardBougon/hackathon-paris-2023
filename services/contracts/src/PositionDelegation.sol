@@ -4,12 +4,13 @@ pragma solidity ^0.8.13;
 import {SafeProxyFactory, SafeProxy} from "../lib/safe/contracts/proxies/SafeProxyFactory.sol";
 import {Safe} from "../lib/safe/contracts/Safe.sol";
 import {NftGuard, ISafe} from "./NftGuard.sol";
-import {ERC721} from "../lib/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721, ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 
-contract PositionDelegation is ERC721 {
+contract PositionDelegation is ERC721Enumerable {
     mapping(address => address) public userToSafe;
+    mapping(address => uint256[2]) public safeToTokenIds;
     address private immutable guardAddress;
 
     /**
@@ -110,5 +111,17 @@ contract PositionDelegation is ERC721 {
         );
 
         super._transfer(from, to, tokenId);
+    }
+
+    function delegate() public {
+        address safeAddress = getOrCreateSafe(msg.sender);
+
+        uint256 ownerTokenId = totalSupply() + 1;
+        _mint(msg.sender, ownerTokenId);
+        uint256 userTokenId = totalSupply() + 1;
+        _mint(msg.sender, userTokenId);
+        
+        safeToTokenIds[safeAddress][0] = ownerTokenId;
+        safeToTokenIds[safeAddress][1] = userTokenId;
     }
 }
