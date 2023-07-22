@@ -3,8 +3,7 @@ pragma solidity ^0.8.13;
 
 import {SafeProxyFactory, SafeProxy} from "../lib/safe/contracts/proxies/SafeProxyFactory.sol";
 import {Safe} from "../lib/safe/contracts/Safe.sol";
-import {NftGuard, ISafe} from "./NftGuard.sol";
-import {ERC721, ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {ERC721Enumerable} from "../lib/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {OwnerManager} from "../lib/safe/contracts/base/OwnerManager.sol";
 import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 
