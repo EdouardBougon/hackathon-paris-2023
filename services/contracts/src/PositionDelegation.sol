@@ -98,6 +98,8 @@ contract PositionDelegation is ERC721Enumerable {
             emptyData
         );
 
+        mintNftsForSafe(safeAddress);
+
         return address(proxy);
     }
 
@@ -209,6 +211,10 @@ contract PositionDelegation is ERC721Enumerable {
      *  mintNftsForSafe
      */
     function mintNftsForSafe(address safeAddress) private {
+        if (safeToTokenIds[safeAddress][0] != 0) {
+            return;
+        }
+
         uint256 ownerTokenId = totalSupply() + 1;
         _mint(msg.sender, ownerTokenId);
         uint256 userTokenId = totalSupply() + 1;
@@ -225,14 +231,15 @@ contract PositionDelegation is ERC721Enumerable {
      */
     function delegate(
         address tokenAddress,
-        uint256 tokenId
+        uint256[] memory tokenIds
     ) public returns (address returnedSafeAddress) {
         address safeAddress = getOrCreateSafe(msg.sender);
 
-        if (safeToTokenIds[safeAddress][0] == 0) {}
-
         ERC721 tokenContract = ERC721(tokenAddress);
-        tokenContract.transferFrom(msg.sender, safeAddress, tokenId);
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            tokenContract.transferFrom(msg.sender, safeAddress, tokenId);
+        }
 
         return safeAddress;
     }
