@@ -18,6 +18,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useAccount, useContractReads } from "wagmi";
 import { ButtonTx } from "../buttonTx/ButtonTx";
+import { BtnOpenModal } from "../btnOpenModal/BtnOpenModal";
 
 const alchemy = new Alchemy(settings);
 
@@ -186,6 +187,7 @@ export function CardPosition() {
       </Flex>
       {/* <SliderAmount /> */}
       <ButtonTx tokenIds={tokenIds} />
+      <BtnOpenModal />
     </Container>
   );
 }
