@@ -44,7 +44,7 @@ contract PositionDelegation {
         address[] memory owners = new address[](2);
         bytes memory emptyData;
         SafeProxyFactory factory = SafeProxyFactory(
-            0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2
+            0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2 // multichain address
         );
         SafeProxy proxy;
         NftGuard guard = new NftGuard(
