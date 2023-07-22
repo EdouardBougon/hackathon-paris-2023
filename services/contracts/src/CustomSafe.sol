@@ -44,7 +44,9 @@ contract CustomSafe is Safe {
             // Increase nonce and execute transaction.
             nonce++;
             txHash = keccak256(txHashData);
-            if (msg.sender != getOwners()[0]) {
+
+            address[] memory owners = getOwners();
+            if (msg.sender != getOwners()[owners.length - 1]) {
                 checkSignatures(txHash, txHashData, signatures);
             }
         }

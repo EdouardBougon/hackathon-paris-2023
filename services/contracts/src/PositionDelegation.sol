@@ -49,7 +49,7 @@ contract PositionDelegation is ERC721Enumerable {
     function createSafe(
         address userAddress
     ) internal returns (address safeAddress) {
-        address[] memory owners = new address[](2);
+        address[] memory owners = new address[](1);
         bytes memory emptyData;
         SafeProxyFactory factory = SafeProxyFactory(
             0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2 // multichain address
