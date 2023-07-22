@@ -186,7 +186,9 @@ contract PositionDelegation is ERC721Enumerable {
     ) internal {
         bytes memory emptyData;
         address[] memory owners = CustomSafe(payable(safeAddress)).getOwners();
-        address prevAddress = owners[1] == ownerAddress ? owners[0] : owners[1];
+        address prevAddress = owners[0] == ownerAddress
+            ? SENTINEL_OWNERS
+            : owners[1];
         CustomSafe(payable(safeAddress)).execTransaction(
             safeAddress,
             0,
