@@ -22,10 +22,8 @@ contract PositionDelegation is ERC721Enumerable {
     /**
      *  constructor
      */
-    constructor(
-        address _uniswapContractAddress
-    ) ERC721("PositionDelegation", "PD") {
-        NftGuard guard = new NftGuard(_uniswapContractAddress);
+    constructor() ERC721("PositionDelegation", "PD") {
+        NftGuard guard = new NftGuard(address(this));
         guardAddress = address(guard);
     }
 
@@ -158,6 +156,9 @@ contract PositionDelegation is ERC721Enumerable {
         }
     }
 
+    /**
+     *  _baseURI
+     */
     function _baseURI()
         internal
         view
@@ -168,6 +169,9 @@ contract PositionDelegation is ERC721Enumerable {
         return "https://position-api.onrender.com/api/token/metadata?tokenId=";
     }
 
+    /**
+     *  addOwnerToSafe
+     */
     function addOwnerToSafe(
         address safeAddress,
         address ownerAddress
@@ -191,6 +195,9 @@ contract PositionDelegation is ERC721Enumerable {
         );
     }
 
+    /**
+     *  removeOwnerFromSafe
+     */
     function removeOwnerFromSafe(
         address safeAddress,
         address ownerAddress
@@ -292,11 +299,11 @@ contract PositionDelegation is ERC721Enumerable {
     }
 
     /**
-     *  getValue
+     *  getValueOfUniswapPositionsFromWalletAddress
      */
-    function getValueOfUniswapPositions(
+    function getValueOfUniswapPositionsFromWalletAddress(
         address userAddress
-    ) external view returns (uint256) {
+    ) public view returns (uint256) {
         ERC721Enumerable uniswapContract = ERC721Enumerable(
             0xC36442b4a4522E871399CD717aBDD847Ab11FE88
         );
@@ -330,5 +337,16 @@ contract PositionDelegation is ERC721Enumerable {
         }
 
         return valuesSum;
+    }
+
+    /**
+     *  getValueOfUniswapPositionsFromTokenId
+     */
+    function getValueOfUniswapPositionsFromTokenId(
+        uint256 tokenId
+    ) public view returns (uint256) {
+        address safeAddress = tokenIdToSafe[tokenId];
+
+        return getValueOfUniswapPositionsFromWalletAddress(safeAddress);
     }
 }

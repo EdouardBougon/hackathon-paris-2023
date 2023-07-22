@@ -13,9 +13,7 @@ contract Deploy is Script {
 
         vm.startBroadcast();
 
-        PositionDelegation factory = new PositionDelegation(
-            0xC36442b4a4522E871399CD717aBDD847Ab11FE88 // https://docs.uniswap.org/contracts/v3/reference/deployments
-        );
+        PositionDelegation factory = new PositionDelegation();
 
         console.log("Factory address: %s", address(factory));
     }

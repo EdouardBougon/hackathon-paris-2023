@@ -17,25 +17,28 @@ contract Delegate is Test {
 
         vm.broadcast();
 
-        PositionDelegation factory = new PositionDelegation(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619);
+        PositionDelegation factory = new PositionDelegation();
 
         address userAddress = 0x48878d24757E2f7cF9f692536a17C2870821663f;
         address kairosAddress = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
-        
+
         // Delegate
         vm.startPrank(userAddress);
 
         MockERC721 uniswapPosition = new MockERC721("Uniswap Position", "UP");
         uniswapPosition.mint(userAddress, 1);
-        
+
         uniswapPosition.approve(address(factory), 1);
 
         uint256[] memory tokenIds = new uint256[](1);
         tokenIds[0] = 1;
-        address safeAddress = factory.delegate(address(uniswapPosition), tokenIds);
+        address safeAddress = factory.delegate(
+            address(uniswapPosition),
+            tokenIds
+        );
         assertEq(uniswapPosition.balanceOf(userAddress), 0);
         assertEq(factory.balanceOf(userAddress), 2);
-        
+
         CustomSafe safe = CustomSafe(payable(safeAddress));
         address[] memory owners = safe.getOwners();
 
@@ -61,6 +64,5 @@ contract Delegate is Test {
         assertEq(owners.length, 2);
         assertEq(owners[0], kairosAddress);
         assertEq(owners[1], address(factory));
-
     }
 }

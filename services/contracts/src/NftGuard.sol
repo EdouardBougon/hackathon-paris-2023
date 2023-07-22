@@ -2,23 +2,26 @@
 pragma solidity ^0.8.19;
 
 import "../lib/safe/contracts/base/GuardManager.sol";
-import "../lib/@openzeppelin/contracts/interfaces/IERC721.sol";
-import "../lib/@openzeppelin/contracts/interfaces/IERC20.sol";
-import "../lib/safe/contracts/Safe.sol";
 
 interface ISafe {
     function getOwners() external view returns (address[] memory);
 }
 
+interface IDelegatePosition {
+    function getValueOfUniswapPositionsFromWalletAddress(
+        address walletAddress
+    ) external view returns (uint256);
+}
+
 contract NftGuard is BaseGuard {
-    address private uniswapContractAddress;
-    uint256 private oldBalanceOf;
+    address private delegateContractAddress;
+    uint256 private oldPosition;
 
     /**
      *  constructor
      */
-    constructor(address _uniswapContractAddress) BaseGuard() {
-        uniswapContractAddress = _uniswapContractAddress;
+    constructor(address _delegateContractAddress) BaseGuard() {
+        delegateContractAddress = _delegateContractAddress;
     }
 
     /**
@@ -49,7 +52,8 @@ contract NftGuard is BaseGuard {
             );
         }
 
-        oldBalanceOf = IERC721(uniswapContractAddress).balanceOf(userAddress);
+        oldPosition = IDelegatePosition(delegateContractAddress)
+            .getValueOfUniswapPositionsFromWalletAddress(userAddress);
     }
 
     /**
@@ -60,16 +64,15 @@ contract NftGuard is BaseGuard {
 
         if (owners.length == 3) {
             address userAddress = owners[1];
-            uint256 newBalanceOf = IERC721(uniswapContractAddress).balanceOf(
-                userAddress
-            );
+            uint256 newPosition = IDelegatePosition(delegateContractAddress)
+                .getValueOfUniswapPositionsFromWalletAddress(userAddress);
 
             require(
-                newBalanceOf >= oldBalanceOf,
-                "NftGuard: Uniswap balance decreased"
+                newPosition >= oldPosition,
+                "NftGuard: Uniswap position decreased"
             );
         }
 
-        delete oldBalanceOf;
+        delete oldPosition;
     }
 }

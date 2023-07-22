@@ -26,7 +26,7 @@ const provider: PublicClient | undefined = createPublicClient({
     multicall: false,
   },
 });
-const positionDelegateContractAddress: `0x${string}` = '0xAF648C9c875CFACB9E07F059582a03622980Aae2';
+const positionDelegateContractAddress: `0x${string}` = '0x8c5617d1076cb3F2FBAec77c78cEC20af33A035d';
 
 app.get('/api/heartbeat', async (req: Request, res: Response): Promise<void> => {
   res.writeHead(200, {}).end('ok')
@@ -67,7 +67,9 @@ app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void
     ]
   };
 
-  res.writeHead(200, {}).end(body)
+  console.log(walletAddress, permission, position, positionString)
+
+  res.writeHead(200, {}).end(JSON.stringify(body))
 });
 
 app.get('/api/token/metadata/image', async (req: Request, res: Response): Promise<void> => {
@@ -119,8 +121,12 @@ async function getWalletAddress(tokenId: bigint): Promise<string | undefined> {
 }
 
 async function getWalletPosition(tokenId: bigint): Promise<bigint | undefined> {
-  console.log(tokenId);
-  return Promise.resolve(0n);
+  return provider?.readContract({
+    address: positionDelegateContractAddress,
+    abi: positionDelegateAbi,
+    functionName: 'getValueOfUniswapPositionsFromTokenId',
+    args: [tokenId],
+  }) 
 }
 
 app.listen(port, () => {
