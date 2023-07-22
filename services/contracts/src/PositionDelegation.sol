@@ -82,21 +82,21 @@ contract PositionDelegation is ERC721Enumerable {
         // Set Guard
         // Safe(payable(proxy)).setGuard(guardAddress);
 
-        // Safe(payable(proxy)).execTransaction(
-        //     address(proxy),
-        //     0,
-        //     abi.encodeWithSelector(
-        //         GuardManager.setGuard.selector,
-        //         guardAddress
-        //     ),
-        //     Enum.Operation.Call,
-        //     0,
-        //     0,
-        //     0,
-        //     address(0),
-        //     payable(0),
-        //     emptyData
-        // );
+        CustomSafe(payable(proxy)).execTransaction(
+            address(proxy),
+            0,
+            abi.encodeWithSelector(
+                GuardManager.setGuard.selector,
+                guardAddress
+            ),
+            Enum.Operation.Call,
+            0,
+            0,
+            0,
+            address(0),
+            payable(0),
+            emptyData
+        );
 
         return address(proxy);
     }
