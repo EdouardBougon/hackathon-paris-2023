@@ -12,7 +12,7 @@ import express from 'express';
 import { polygon } from 'viem/chains';
 
 const app: express.Express = express();
-const port: number = 8887;
+const port: number = process.env.PORT !== undefined ? Number(process.env.PORT) : 8887;
 // const hostname: string = `http://localhost:${port}`;
 const hostname: string = 'https://position-api.onrender.com';
 
