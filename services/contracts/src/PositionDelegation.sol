@@ -22,9 +22,9 @@ contract PositionDelegation is ERC721Enumerable {
      *  constructor
      */
     constructor(
-        address _wethContractAddress
+        address _uniswapContractAddress
     ) ERC721("PositionDelegation", "PD") {
-        NftGuard guard = new NftGuard(_wethContractAddress);
+        NftGuard guard = new NftGuard(_uniswapContractAddress);
         guardAddress = address(guard);
     }
 
@@ -235,6 +235,11 @@ contract PositionDelegation is ERC721Enumerable {
         address tokenAddress,
         uint256[] memory tokenIds
     ) public returns (address returnedSafeAddress) {
+        require(
+            tokenIds.length > 0,
+            "tokenIds length should be greater than 0"
+        );
+
         address safeAddress = getOrCreateSafe(msg.sender);
 
         ERC721 tokenContract = ERC721(tokenAddress);

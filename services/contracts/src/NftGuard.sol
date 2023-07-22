@@ -11,14 +11,14 @@ interface ISafe {
 }
 
 contract NftGuard is BaseGuard {
-    address private wethContractAddress;
-    uint256 private oldWethAmount;
+    address private uniswapContractAddress;
+    uint256 private oldBalanceOf;
 
     /**
      *  constructor
      */
-    constructor(address _wethContractAddress) BaseGuard() {
-        wethContractAddress = _wethContractAddress;
+    constructor(address _uniswapContractAddress) BaseGuard() {
+        uniswapContractAddress = _uniswapContractAddress;
     }
 
     /**
@@ -49,7 +49,7 @@ contract NftGuard is BaseGuard {
             );
         }
 
-        oldWethAmount = IERC20(wethContractAddress).balanceOf(userAddress);
+        oldBalanceOf = IERC721(uniswapContractAddress).balanceOf(userAddress);
     }
 
     /**
@@ -60,16 +60,16 @@ contract NftGuard is BaseGuard {
 
         if (owners.length == 3) {
             address userAddress = owners[1];
-            uint256 newWethAmount = IERC20(wethContractAddress).balanceOf(
+            uint256 newBalanceOf = IERC721(uniswapContractAddress).balanceOf(
                 userAddress
             );
 
             require(
-                newWethAmount >= oldWethAmount,
-                "NftGuard: WETH balance decreased"
+                newBalanceOf >= oldBalanceOf,
+                "NftGuard: Uniswap balance decreased"
             );
         }
 
-        delete oldWethAmount;
+        delete oldBalanceOf;
     }
 }
