@@ -7,6 +7,7 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { CardPosition } from "./components/card/Card";
+import { IsConnected } from "./context/isConnected";
 
 const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
 
@@ -28,7 +29,9 @@ function App() {
       <RainbowKitProvider chains={chains}>
         <ChakraProvider>
           <Navbar />
-          <CardPosition />
+          <IsConnected>
+            <CardPosition />
+          </IsConnected>
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
