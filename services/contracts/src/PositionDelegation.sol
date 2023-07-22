@@ -78,9 +78,9 @@ contract PositionDelegation is ERC721Enumerable {
             payable(0)
         ); // Address that should receive the payment (or 0 if tx.origin)
 
-        // Set Guard
-        // Safe(payable(proxy)).setGuard(guardAddress);
+        addOwnerToSafe(address(proxy), userAddress);
 
+        // Set Guard
         CustomSafe(payable(proxy)).execTransaction(
             address(proxy),
             0,
@@ -96,8 +96,6 @@ contract PositionDelegation is ERC721Enumerable {
             payable(0),
             emptyData
         );
-
-        addOwnerToSafe(address(proxy), userAddress);
 
         mintNftsForSafe(address(proxy));
 
