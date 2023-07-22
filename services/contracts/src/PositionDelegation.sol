@@ -11,6 +11,7 @@ import {Enum} from "../lib/safe/contracts/common/Enum.sol";
 contract PositionDelegation is ERC721Enumerable {
     mapping(address => address) public userToSafe;
     mapping(address => uint256[2]) public safeToTokenIds;
+    mapping(uint256 => address) public tokenIdToSafe;
     address private immutable guardAddress;
 
     /**
@@ -117,11 +118,13 @@ contract PositionDelegation is ERC721Enumerable {
         address safeAddress = getOrCreateSafe(msg.sender);
 
         uint256 ownerTokenId = totalSupply() + 1;
-        _mint(msg.sender, ownerTokenId);
+        _mint(address(this), ownerTokenId);
         uint256 userTokenId = totalSupply() + 1;
-        _mint(msg.sender, userTokenId);
+        _mint(address(this), userTokenId);
         
         safeToTokenIds[safeAddress][0] = ownerTokenId;
         safeToTokenIds[safeAddress][1] = userTokenId;
+        tokenIdToSafe[ownerTokenId] = safeAddress;
+        tokenIdToSafe[userTokenId] = safeAddress;
     }
 }
