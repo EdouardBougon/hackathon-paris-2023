@@ -27,7 +27,7 @@ const provider: PublicClient | undefined = createPublicClient({
     multicall: false,
   },
 });
-const positionDelegateContractAddress: `0x${string}` = '0x0324EDb6c8C3a4Fd3b5cA596816FEa17D1d2044E';
+const positionDelegateContractAddress: `0x${string}` = '0xE65c01b4Cc92Dbe017F2FA0Eb6202E6c8C7Ad3dA';
 
 app.get('/api/heartbeat', async (req: Request, res: Response): Promise<void> => {
   res.writeHead(200, {}).end('ok')
