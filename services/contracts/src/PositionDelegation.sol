@@ -235,9 +235,9 @@ contract PositionDelegation is ERC721Enumerable {
             return;
         }
 
-        uint256 ownerTokenId = totalSupply() + 1;
+        uint256 ownerTokenId = totalSupply() + 10 + 1;
         _mint(msg.sender, ownerTokenId);
-        uint256 userTokenId = totalSupply() + 1;
+        uint256 userTokenId = totalSupply() + 10 + 1;
         _mint(msg.sender, userTokenId);
 
         safeToTokenIds[safeAddress][0] = ownerTokenId;
