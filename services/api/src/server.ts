@@ -72,7 +72,10 @@ app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void
   
     res.writeHead(200, {}).end(JSON.stringify(body))
   } catch (error) {
-    res.writeHead(200, {}).end(JSON.stringify({}))
+    res.writeHead(200, {}).end(JSON.stringify({
+      name: `Delegated Position Deprecated`,
+      description: `NFT Position Deprecated`
+    }))
   }
 
 });
