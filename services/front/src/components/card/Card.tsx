@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CardBody,
   Card,
@@ -19,6 +20,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccount, useContractReads } from "wagmi";
 import { ButtonTx } from "../buttonTx/ButtonTx";
 import { BtnOpenModal } from "../btnOpenModal/BtnOpenModal";
+import { formatUnits } from "viem";
 
 const alchemy = new Alchemy(settings);
 
@@ -97,7 +99,7 @@ export function CardPosition() {
   const { address } = useAccount();
   const [positions, setPositions] = useState<OwnedNft[] | null>(null);
   const [tokenIds, setTokenIds] = useState<bigint[]>([]);
-  const [TotalValue, setTotalValue] = useState<number[]>([]);
+  const [TotalValue, setTotalValue] = useState<bigint[]>([]);
 
   useContractReads({
     contracts: positions?.map((position) => ({
@@ -110,9 +112,9 @@ export function CardPosition() {
       console.log(error);
     },
     onSuccess: (data) => {
-      const totalValue: number[] = [];
+      const totalValue: bigint[] = [];
       data?.forEach((position) => {
-        position && totalValue.push(Number((position.result as any)[7]) / 1e6);
+        position && totalValue.push((position.result as any)[7]);
       });
       setTotalValue(totalValue);
     },
@@ -121,10 +123,10 @@ export function CardPosition() {
   // get all nft positions from uniswap v3 with alchemy
   const getUniswapV3Positions = useCallback(async () => {
     if (!address) return;
-    const positions = await alchemy.nft.getNftsForOwner(address, {
+    const result = await alchemy.nft.getNftsForOwner(address, {
       contractAddresses: [uniswapNftAddress],
     });
-    setPositions(positions.ownedNfts);
+    setPositions(result.ownedNfts);
   }, [address]);
 
   useEffect(() => {
@@ -178,7 +180,7 @@ export function CardPosition() {
                 </Center>
                 <Center>
                   <Text marginTop={5}>
-                    Total value : ${TotalValue[index] * 2}
+                    Total value : ${formatUnits(TotalValue[index], 9)}
                   </Text>
                 </Center>
               </CardBody>

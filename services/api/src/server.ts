@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import {
   PublicClient,
   createPublicClient,
+  formatUnits,
   http,
 } from 'viem';
 import { positionDelegateAbi } from "./abis/positionDelegate.abi";
@@ -44,7 +45,7 @@ app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void
     'USER';
   const walletAddress: string | undefined = await getWalletAddress(tokenId);
   const position: bigint | undefined = await getWalletPosition(tokenId);
-  const positionString: string =  position?.toString() ?? '0';
+  const positionString: string = formatUnits(position ?? 0n, 9);
 
   const body: any = {
     name: `Delegated ${permission}`,
@@ -81,7 +82,7 @@ app.get('/api/token/metadata/image', async (req: Request, res: Response): Promis
   const tokenId: bigint = BigInt(req.query.tokenId as string);
   const walletAddress: string | undefined = await getWalletAddress(tokenId);
   const position: bigint | undefined = await getWalletPosition(tokenId);
-  const positionString: string =  position?.toString() ?? '0';
+  const positionString: string = formatUnits(position ?? 0n, 9);
 
   const permission: string = await isTokenIdOwnerOfWallet(tokenId) ?
     'OWNER' :
