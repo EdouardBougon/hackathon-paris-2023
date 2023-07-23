@@ -180,7 +180,7 @@ export function CardPosition() {
                 </Center>
                 <Center>
                   <Text marginTop={5}>
-                    Total value : ${formatUnits(TotalValue[index], 9)}
+                    Total value : ${formatUnits(TotalValue[index] ?? 0n, 9)}
                   </Text>
                 </Center>
               </CardBody>
