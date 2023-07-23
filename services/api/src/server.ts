@@ -34,14 +34,13 @@ app.get('/api/heartbeat', async (req: Request, res: Response): Promise<void> => 
 });
 
 app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void> => {
+  const tokenId: bigint = BigInt(req.query.tokenId as string);
   try {
-
     if (req.query.tokenId === undefined) {
       res.writeHead(400, {}).end('Missing tokenId query parameter');
       return;
     }
   
-    const tokenId: bigint = BigInt(req.query.tokenId as string);
     const permission: string = await isTokenIdOwnerOfWallet(BigInt(tokenId)) ?
       'OWNER' :
       'USER';
@@ -74,20 +73,22 @@ app.get('/api/token/metadata', async (req: Request, res: Response): Promise<void
   } catch (error) {
     res.writeHead(200, {}).end(JSON.stringify({
       name: `Delegated Position Deprecated`,
-      description: `NFT Position Deprecated`
+      description: `NFT Position Deprecated`,
+      image: `${protocol}://${req.hostname}:${externalPort}/api/token/metadata/image?tokenId=${tokenId}`,
     }))
   }
 
 });
 
 app.get('/api/token/metadata/image', async (req: Request, res: Response): Promise<void> => {
+  const tokenId: bigint = BigInt(req.query.tokenId as string);
+
   try {
     if (req.query.tokenId === undefined) {
       res.writeHead(400, {}).end('Missing tokenId query parameter');
       return;
     }
   
-    const tokenId: bigint = BigInt(req.query.tokenId as string);
     const walletAddress: string | undefined = await getWalletAddress(tokenId);
     const position: bigint | undefined = await getWalletPosition(tokenId);
     const positionString: string = formatUnits(position ?? 0n, 9);
@@ -109,7 +110,11 @@ app.get('/api/token/metadata/image', async (req: Request, res: Response): Promis
   
     res.writeHead(200, {'Content-Type': 'image/svg+xml'}).end(body)
   } catch (error) {
-    res.writeHead(200, {'Content-Type': 'image/svg+xml'}).end(`<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"></svg>`)
+    const body: any =`<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="300" height="300" x="0" y="0" fill="white" />
+        <text x="50%" y="10%" fill="#ED2647" text-decoration="underline" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Delegated Wallet Deprecated: ${tokenId}</text>
+      </svg>`;
+    res.writeHead(200, {'Content-Type': 'image/svg+xml'}).end(body)
   }
 });
 
