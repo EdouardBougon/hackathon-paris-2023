@@ -11,7 +11,7 @@ export function Navbar() {
       shadow={"0px 0px 10px 0px rgba(0,0,0,0.25)"}
     >
       <Box p="2">
-        <Heading size="md">Chakra App</Heading>
+        <Heading size="xl" color={'#ED2647'}>Splitooor</Heading>
       </Box>
       <Spacer />
       <ButtonGroup gap="2">

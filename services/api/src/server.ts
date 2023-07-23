@@ -89,14 +89,14 @@ app.get('/api/token/metadata/image', async (req: Request, res: Response): Promis
     'USER';
 
   const body: any =`<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-      <rect width="300" height="300" x="0" y="0" fill="#1F2548" />
+      <rect width="300" height="300" x="0" y="0" fill="white" />
       <a href="https://polygonscan.com/address/${walletAddress}#tokentxnsErc721" target="_blank">
-        <text x="50%" y="10%" fill="white" text-decoration="underline" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Delegated Wallet ${tokenId}</text>
+        <text x="50%" y="10%" fill="#ED2647" text-decoration="underline" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Delegated Wallet ${tokenId}</text>
       </a>
-      <text x="50%" y="35%" fill="white" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Wallet: ${walletAddress?.slice(0, 4)}...${walletAddress?.slice(-4)}</text>
-      <text x="50%" y="45%" fill="white" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Permission: ${permission}</text>
-      <text x="50%" y="75%" fill="white" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Total Value:</text>
-      <text x="50%" y="85%" fill="white" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">${positionString} USD</text>
+      <text x="50%" y="35%" fill="#ED2647" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Wallet: ${walletAddress?.slice(0, 4)}...${walletAddress?.slice(-4)}</text>
+      <text x="50%" y="45%" fill="#ED2647" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Permission: ${permission}</text>
+      <text x="50%" y="75%" fill="#ED2647" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">Total Value:</text>
+      <text x="50%" y="85%" fill="#ED2647" font-family="Arial, Helvetica, sans-serif" dominant-baseline="middle" text-anchor="middle" font-size="20px">${positionString} USD</text>
     </svg>`;
 
   res.writeHead(200, {'Content-Type': 'image/svg+xml'}).end(body)
